@@ -1,110 +1,28 @@
 
 import * as THREE from "three"
+import { initWorld } from "./modules/world.js";
+import { loadModels } from "./modules/loadModel.js";
+import { addMovement, updateMovement } from "./modules/movement.js";
+import { scene, setupScene } from "./modules/initScene.js";
+import { createLights } from "./modules/light.js";
+import { addRotationX } from "./modules/animations.js";
 
-//scene
-const scene = new THREE.Scene()
+const clock = new THREE.Clock();
 
-//camera
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-scene.add(camera)
-camera.position.z = 5
+const { camera, controls, renderer } = setupScene()
+const {walls} = initWorld()
+const {astronauta,satellite} = loadModels()
 
+addMovement(controls)
 
-//Renderer
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight)
-console.log(window.innerHeight)
-renderer.setClearColor(0xffffff, 1);
-document.body.appendChild(renderer.domElement)
-
-
-//lights
-let ambientLight = new THREE.AmbientLight(0x101010, 1);
-ambientLight.position.x = camera.position.x //light follow the camera
-ambientLight.position.y = camera.position.y //light follow the camera
-ambientLight.position.z = camera.position.z //light follow the camera
-scene.add(ambientLight)
-
-// Direction of light
-let sunlight = new THREE.DirectionalLight(0xddddd, 1);
-sunlight.position.y = 15;
-scene.add(sunlight)
-
-
-// Create cube
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 'red' })
-const cube = new THREE.Mesh(geometry, material)
-scene.add(cube)
-
-document.addEventListener('keydown', () => {
-  const pressed = event.key
-  if (pressed == 'ArrowUp') {
-    camera.translateY(0.05)
-  }
-})
-
-// FLOOR
-// const planeGeometry = new THREE.PlaneGeometry(50, 50)
-const floorTexture = new THREE.TextureLoader().load('elyvisions/elyvisions/arch3_dn.png')
-floorTexture.wrapS = THREE.RepeatWrapping
-floorTexture.wrapT = THREE.RepeatWrapping
-floorTexture.repeat.set(20, 20)
-
-const planeGeometry = new THREE.PlaneGeometry(50, 50)
-const planeMaterial = new THREE.MeshBasicMaterial({
-  map: floorTexture, //  color:'green',
-  side: THREE.DoubleSide
-})
-const floor = new THREE.Mesh(planeGeometry, planeMaterial)
-floor.rotation.x = Math.PI / 2
-floor.position.y = -Math.PI
-scene.add(floor)
-
-// WALLS
-const wallGroup = new THREE.Group()
-scene.add(wallGroup)
-//frontWall
-const frontWallTexture = new THREE.TextureLoader().load('elyvisions/elyvisions/arch3_ft.png')
-const frontWall = new THREE.Mesh(
-  new THREE.BoxGeometry(50, 20, -0.05),
-  new THREE.MeshBasicMaterial({
-    map: frontWallTexture,
-  }))
-frontWall.position.z = -20
-//leftWall
-const leftWallTexture = new THREE.TextureLoader().load('elyvisions/elyvisions/arch3_lf.png')
-const leftWall = new THREE.Mesh(
-  new THREE.BoxGeometry(50, 20, 0.001),
-  new THREE.MeshBasicMaterial({
-    map: leftWallTexture,
-  }))
-leftWall.position.x = -20
-leftWall.position.y = Math.PI / 2
-//rightWall
-const rightWallTexture = new THREE.TextureLoader().load('elyvisions/elyvisions/arch3_lf.png')
-const rightWall = new THREE.Mesh(
-  new THREE.BoxGeometry(50, 20, 0.001),
-  new THREE.MeshBasicMaterial({
-    map: rightWallTexture,
-  }))
-rightWall.position.x = 20
-rightWall.position.y = Math.PI / 2
-
-wallGroup.add(frontWall, leftWall, rightWall)
-
+createLights(scene,{x:1,y:1,z:1})
 
 let render = function () {
-  cube.rotation.x += 0.01
-  cube.rotation.y += 0.01
 
+  const delta = clock.getDelta();
+  updateMovement(delta, controls, camera, walls);
+  renderer.gammaFactor = 2.2;
   renderer.render(scene, camera)
   requestAnimationFrame(render)
 }
-
 render()

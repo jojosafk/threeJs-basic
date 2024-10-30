@@ -1,0 +1,8 @@
+Model Information:
+* title:	Astronaut Stylized
+* source:	https://sketchfab.com/3d-models/astronaut-stylized-942e4aba77e546ecbacfab3ad9235e94
+* author:	MuseModels (https://sketchfab.com/MuseModels)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
